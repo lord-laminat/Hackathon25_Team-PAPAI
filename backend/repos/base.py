@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import Generic, TypeVar, Type, Optional, List
+from typing import Generic, TypeVar, Type, Optional, List, Union, Dict, Any
 from pydantic import BaseModel
 
 ModelType = TypeVar("ModelType")
@@ -20,7 +20,7 @@ class BaseRepository(Generic[ModelType]):
 
     # 2. Создать объект
     def create(self, obj_in: BaseModel) -> ModelType:
-        # Превращаем Pydantic-схему в словарь, а потом в ORM-объект, прости сатана
+        # Превращаем Pydantic-схему в словарь, а потом в ORM-объект
         db_obj = self.model(**obj_in.dict())
         self.db.add(db_obj)    # Добавляем в сессию
         self.db.commit()       # Сохраняем изменения в БД
@@ -34,3 +34,23 @@ class BaseRepository(Generic[ModelType]):
         self.db.delete(obj)    # Удаляем его
         self.db.commit()       # Сохраняем изменения
         return obj
+
+    # 4. Обновить информацию об объектах
+    def update(self, db_obj: ModelType, obj_in: Union[BaseModel, Dict[str, Any]]) -> ModelType:
+        # Преобразуем объект Pydantic в словарь, если это необходимо
+        if isinstance(obj_in, BaseModel):
+            # Исключаем не переданные поля
+            update_data = obj_in.dict(exclude_unset=True)
+        else:
+            update_data = obj_in
+
+        # Обновляем поля объекта
+        for field in update_data:
+            if hasattr(db_obj, field):
+                setattr(db_obj, field, update_data[field])
+
+        # Сохраняем изменения
+        self.db.add(db_obj)
+        self.db.commit()
+        self.db.refresh(db_obj)
+        return db_obj
