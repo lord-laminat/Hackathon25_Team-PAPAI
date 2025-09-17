@@ -1,0 +1,13 @@
+# Langchain + MCP
+
+langchain
+langchain-core
+langchain-deepseek
+langchain-mcp-adapters
+langgraph
+langgraph-checkpoint
+langgraph-prebuilt
+langgraph-sdk
+langsmith
+mcp
+openai
