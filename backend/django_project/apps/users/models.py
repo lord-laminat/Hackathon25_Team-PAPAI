@@ -12,6 +12,13 @@ class User(AbstractUser):
 
     # TODO: UsersGroup Foreign Key
     # users_group = models.ForeignKey()
+
     
     def __str__(self):
         return f"User: {self.get_full_name()} - {self.email} ({self.points} points)"
+
+
+    class Meta:
+        default_related_name = 'custom_users'
+
+        permissions = [] # TODO: add permisions
