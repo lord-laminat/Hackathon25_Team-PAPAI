@@ -4,4 +4,8 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    pass
+    # user_fields = UserAdmin.user_fields + ('email', 'skills', 'experience_points', 'mana_points', 'rank', )
+
+    fieldsets = UserAdmin.fieldsets + (
+        ('Extra Fields', {'fields': ('skills', 'experience_points', 'mana_points', 'rank', )}),
+    )
