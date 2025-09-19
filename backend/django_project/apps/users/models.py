@@ -12,3 +12,6 @@ class User(AbstractUser):
 
     # TODO: UsersGroup Foreign Key
     # users_group = models.ForeignKey()
+    
+    def __str__(self):
+        return f"User: {self.get_full_name()} - {self.email} ({self.points} points)"
