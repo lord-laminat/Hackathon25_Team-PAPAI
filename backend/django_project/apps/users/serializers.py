@@ -57,3 +57,38 @@ class LoginSerializer(serializers.Serializer):
             'username': user.username,
             'token': user.token
         }
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    # TODO: docstring
+    password = serializers.CharField(
+        max_length=128,
+        min_length=8,
+        write_only=True
+    )
+
+
+    def update(self, instance: CustomUser, validated_data):
+        """ Updates CustomUser data in DB """
+
+        password = validated_data.pop('password', None)
+
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+
+        if password is not None:
+            instance.set_password(password)
+
+        instance.save()
+
+        return instance
+
+
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'username', 'password', 'token',)
+
+        read_only_fields = ('token',)
+
+
+    
