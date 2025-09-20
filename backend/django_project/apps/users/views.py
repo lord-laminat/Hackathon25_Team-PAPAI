@@ -7,9 +7,7 @@ from .serializers import RegistrationSerializer, LoginSerializer
 
 
 class RegistrationView(APIView):
-    """
-    Registration endpoint
-    """
+    """ Registration endpoint """
 
     permission_classes = (AllowAny, )
     serializer_class = RegistrationSerializer
@@ -34,6 +32,7 @@ class RegistrationView(APIView):
 
 
 class LoginView(APIView):
+    """ Logining endpoint"""
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
