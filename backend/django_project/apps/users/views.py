@@ -1,28 +1,39 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.contrib.auth import authenticate, login
-from .forms import LoginForm
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.renderers import TemplateHTMLRenderer
+from .serializers import RegistrationSerializer
 
-def login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        print("Yes")
 
-        if form.is_valid():
-            cd = form.cleaned_data
-            user = authenticate(username=cd['username'], password=cd['password'])
+class RegistrationView(APIView):
+    """
+    Registration endpoint
+    """
 
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
+    permission_classes = (AllowAny, )
+    serializer_class = RegistrationSerializer
+    renderer_classes = (TemplateHTMLRenderer, )
 
-                    return HttpResponse('Authenticated successfully')
-                else:
-                    return HttpResponse('Disabled account')
-            else:
-                return HttpResponse('Invalid login')
-    else:
-        print("No")
-        form = LoginForm()
+    template_name = 'login.html'
 
-    return HttpResponse(render(request=request, template_name="login.html", context={'form' : form}))
+
+    def get(self, request):
+        # TODO: real GET response
+        return Response(status=status.HTTP_200_OK)
+
+
+    def post(self, request):
+        """
+        POST request
+        Args:
+            request: headers
+        """
+
+        user = request.data.get('user', {})
+
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
