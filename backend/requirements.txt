@@ -4,6 +4,7 @@ asgiref==3.9.1
 cffi==2.0.0
 cryptography==46.0.1
 Django==5.2.6
+djangorestframework==3.16.1
 dotenv==0.9.9
 idna==3.10
 jwt==1.4.0
