@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.renderers import JSONRenderer
 from .serializers import RegistrationSerializer, LoginSerializer
 
 
@@ -14,11 +14,7 @@ class RegistrationView(APIView):
     permission_classes = (AllowAny, )
     serializer_class = RegistrationSerializer
 
-    # renderer_classes = (TemplateHTMLRenderer, )
-    # template_name = 'register.html'
-    # def get(self, request):
-    #     # TODO: real GET response
-    #     return Response(status=status.HTTP_200_OK)
+    renderer_classes = (JSONRenderer, )
 
 
     def post(self, request):
@@ -41,11 +37,7 @@ class LoginView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
-    # renderer_classes = (TemplateHTMLRenderer,)
-    # template_name = "login.html"
-    # def get(self, request):
-    #     # TODO: real GET response
-    #     return Response(status=status.HTTP_200_OK)
+    renderer_classes = (JSONRenderer, )
 
 
     def post(self, request):
