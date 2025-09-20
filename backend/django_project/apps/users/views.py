@@ -13,14 +13,12 @@ class RegistrationView(APIView):
 
     permission_classes = (AllowAny, )
     serializer_class = RegistrationSerializer
-    renderer_classes = (TemplateHTMLRenderer, )
 
-    template_name = 'register.html'
-
-
-    def get(self, request):
-        # TODO: real GET response
-        return Response(status=status.HTTP_200_OK)
+    # renderer_classes = (TemplateHTMLRenderer, )
+    # template_name = 'register.html'
+    # def get(self, request):
+    #     # TODO: real GET response
+    #     return Response(status=status.HTTP_200_OK)
 
 
     def post(self, request):
@@ -42,14 +40,12 @@ class RegistrationView(APIView):
 class LoginView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
-    renderer_classes = (TemplateHTMLRenderer,)
 
-    template_name = "login.html"
-
-
-    def get(self, request):
-        # TODO: real GET response
-        return Response(status=status.HTTP_200_OK)
+    # renderer_classes = (TemplateHTMLRenderer,)
+    # template_name = "login.html"
+    # def get(self, request):
+    #     # TODO: real GET response
+    #     return Response(status=status.HTTP_200_OK)
 
 
     def post(self, request):
