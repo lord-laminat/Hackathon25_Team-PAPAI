@@ -1,6 +1,9 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .enums import Rank
+import jwt
+from datetime import datetime,timedelta
 
 
 class CustomUser(AbstractUser):
@@ -22,6 +25,24 @@ class CustomUser(AbstractUser):
     experience_points = models.PositiveIntegerField(verbose_name='experience_points', default=0)
     mana_points = models.PositiveIntegerField(verbose_name='mana_points', default=0)
     rank = models.PositiveSmallIntegerField(verbose_name='rank', choices=Rank.choices(), default=Rank.BEGINNER.value)
+
+
+    @property
+    def token(self):
+        """Returns jwt token"""
+        return self._generate_jwt_token()
+
+
+    def _generate_jwt_token(self):
+        """Generates JWT that expires after 1 day"""
+        dt = datetime.now() + timedelta(days=1)
+
+        token = jwt.encode({
+            'id': self.pk,
+            'exp': int(dt.strftime('%s'))
+        }, settings.SECRET_KEY, algorithm='HS256')
+
+        return token.decode('utf-8')
 
 
     def __str__(self):
