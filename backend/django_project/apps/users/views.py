@@ -1,28 +1,73 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.contrib.auth import authenticate, login
-from .forms import LoginForm
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from .serializers import RegistrationSerializer, LoginSerializer, CustomUserSerializer
 
-def login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        print("Yes")
 
-        if form.is_valid():
-            cd = form.cleaned_data
-            user = authenticate(username=cd['username'], password=cd['password'])
+class RegistrationView(APIView):
+    """ Registration endpoint """
 
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
+    permission_classes = (AllowAny, )
+    serializer_class = RegistrationSerializer
 
-                    return HttpResponse('Authenticated successfully')
-                else:
-                    return HttpResponse('Disabled account')
-            else:
-                return HttpResponse('Invalid login')
-    else:
-        print("No")
-        form = LoginForm()
+    renderer_classes = (JSONRenderer, )
 
-    return HttpResponse(render(request=request, template_name="login.html", context={'form' : form}))
+
+    def post(self, request):
+        """
+        POST request
+        Args:
+            request: headers
+        """
+
+        user = request.data.get('user', {})
+
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class LoginView(APIView):
+    """ Logining endpoint"""
+    permission_classes = (AllowAny,)
+    serializer_class = LoginSerializer
+
+    renderer_classes = (JSONRenderer, )
+
+
+    def post(self, request):
+        user = request.data.get('user', {})
+
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CustomUserRetrieve(APIView):
+    """ CustomUser data retreive endpoint """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = CustomUserSerializer
+
+    renderer_classes = (JSONRenderer, )
+
+
+    def get(self, request, *args, **kwargs):
+        serializer = self.serializer_class(request.user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def update(self, request, *args, **kwargs):
+        serializer_data = request.data.get('user', {})
+
+        serializer = self.serializer_class(request.user, data=serializer_data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    pass

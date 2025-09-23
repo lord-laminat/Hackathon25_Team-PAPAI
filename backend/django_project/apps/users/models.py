@@ -1,6 +1,10 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MinLengthValidator
+from .enums import Rank
+import jwt
+from datetime import datetime,timedelta
 
 
 class CustomUser(AbstractUser):
@@ -23,6 +27,24 @@ class CustomUser(AbstractUser):
     @property
     def total_mana(self):
         return self.progress.mana if self.progress else 0
+
+
+    @property
+    def token(self):
+        """Returns jwt token"""
+        return self._generate_jwt_token()
+
+
+    def _generate_jwt_token(self):
+        """Generates JWT that expires after 1 day"""
+        dt = datetime.now() + timedelta(days=1)
+
+        token = jwt.encode({
+            'id': self.pk,
+            'exp': int(dt.strftime('%s'))
+        }, settings.SECRET_KEY, algorithm='HS256')
+
+        return token
 
 
     def __str__(self):
