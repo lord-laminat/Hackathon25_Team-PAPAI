@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MinLengthValidator
 
 
 class CustomUser(AbstractUser):
@@ -41,6 +41,7 @@ class CustomUser(AbstractUser):
 
 
 class Rank(models.Model):
+    level = models.PositiveSmallIntegerField(verbose_name='level', default=0, unique=True)
     name = models.CharField(max_length=100, unique=True)
     required_exp = models.PositiveIntegerField(verbose_name='required exp', default=0)
     # required_missions = models.ManyToManyField('Mission', through='RankMission', blank=True)
@@ -50,6 +51,22 @@ class Rank(models.Model):
     class Meta:
         ordering = ['required_exp']
 
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class Competence(models.Model):
+    name = models.CharField(verbose_name='name', max_length=100, unique=True, validators=[MinLengthValidator(2)])
+    description = models.CharField(verbose_name='description', blank=True)
+
+
+    class Meta:
+        verbose_name = 'Competence'
+        verbose_name_plural = 'Competences'
+        indexes = [models.Index(fields=['name'])]
+        ordering = ['name']
+    
 
     def __str__(self):
         return f'{self.name}'
@@ -66,3 +83,14 @@ class UserProgress(models.Model):
     exp = models.PositiveIntegerField(verbose_name='exp', default=0, validators=[MinValueValidator])
     mana = models.PositiveIntegerField(verbose_name='mana_points', default=0, validators=[MinValueValidator])
     rank = models.ForeignKey(Rank, verbose_name='rank', on_delete=models.PROTECT, blank=True, null=True)
+    compenteces = models.ManyToManyField(Competence, verbose_name='Competences', through='UserCompetence', related_name='progress_users')
+
+
+class UserCompetence(models.Model):
+    progress = models.ForeignKey('UserProgress', on_delete=models.CASCADE, related_name='competences_levels')
+    competence = models.ForeignKey(Competence, on_delete=models.CASCADE)
+    level = models.PositiveIntegerField(default=0, validators=[MinLengthValidator(0)])
+
+
+    class Meta:
+        unique_together = ('progress', 'competence')
